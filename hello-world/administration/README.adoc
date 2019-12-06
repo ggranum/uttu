@@ -1,0 +1,30 @@
+= Administration Tools
+
+== Cert creation
+
+A typical path will be to create a cert by running create-certs.sh on a local machine. That cert will have a password
+that must be used later to load the cert into a keystore. The keystore should be generated on the machine in
+which it will be used. This is hardly required, but having a development/qa process that doesn't rely on having
+keystores saved into source control is likely to be less of a hassle in the long run.
+
+Production, of course, will require a real cert. All your instances will need the same cert. If you commit this to source control there's a good chance you're an idiot. Or very new to this whole thing, if we're being generous.
+
+Each production server can still use a different keystore password. Which is to say, you could still have all your instances create a new keystore at startup. This won't be a big deal in many cases, and keeps your workflow closer to development.
+
+
+=== Creating Certs on the server
+Technically most use cases don't require anyone but the server to know about the cert. If you aren't doing agent-based communication with your server, you might just decide to create the cert on your dev and QA servers directly. That's fine. You'll still need to figure out how you want to deploy a consistent cert to production, but this option might make your dev and QA deployments simpler.
+
+If you're doing browser based access, just know that you'll probably be accepting a new cert every time you re-deploy (assuming you're using Kubernetes / Docker etc).
+
+To be clear, this is NON Production cases only. Your production cert is precious and you do not want to be regenerating it except when it's about to expire.
+
+
+== Running scripts
+
+The scripts are coded to be run from either the 'dev' or the 'prod' directory. For development certs and stores, for example, just cd into 'administration/dev' and run `./create-and-load-jetty-cert.sh`. You'll then want to copy the keystore and keystore.properties files into your ${jettyHome}/etc/ directory.
+
+
+== General
+See http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html for some of the better documentation on
+the whole SSL game.

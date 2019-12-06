@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+  ~ This software is licensed under the MIT License.
+  ~
+  ~ Copyright (c) 2019 Geoff M. Granum
+  -->
+<Configuration status="info" strict="true" name="UttuLogConfig" monitorInterval="10">
+  <Properties>
+    <Property name="basePath">./logs/uttu/</Property>
+    <Property name="baseName">uttu</Property>
+  </Properties>
+  <Appenders>
+    <Appender type="Console" name="consoleLogger">
+      <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+      <Layout type="PatternLayout">
+        <Pattern>%d{ISO8601} | %level{length=1} | %m | [%t] | %c %n</Pattern>
+      </Layout>
+    </Appender>
+    <RollingFile name="allLogger" fileName="${basePath}/all.log"
+                 filePattern="${basePath}/$${date:yyyy-MM}/central-%d{MM-dd-yyyy}-%i.log.gz">
+      <Layout type="PatternLayout">
+        <Pattern>%d{ISO8601} | %level{length=1} | %m | [%t] | %c %n</Pattern>
+      </Layout>
+      <Policies>
+        <OnStartupTriggeringPolicy/>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="2 MB"/>
+      </Policies>
+    </RollingFile>
+    <RollingFile name="fileLogger" fileName="${basePath}/${baseName}.log"
+                 filePattern="${basePath}/$${date:yyyy-MM}/central-%d{MM-dd-yyyy}-%i.log.gz">
+      <Layout type="PatternLayout">
+        <Pattern>%d{ISO8601} | %level{length=1} | %m | [%t] | %c %n</Pattern>
+      </Layout>
+      <Policies>
+        <OnStartupTriggeringPolicy/>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="25 MB"/>
+      </Policies>
+    </RollingFile>
+    <RollingFile name="queryLogger" fileName="${basePath}/${baseName}_queries.log"
+                 filePattern="${basePath}/$${date:yyyy-MM}/central-queries-%d{MM-dd-yyyy}-%i.log.gz">
+      <Layout type="PatternLayout">
+        <Pattern>%d{ISO8601} | %level{length=1} | %m | [%t] | %c %n</Pattern>
+      </Layout>
+      <Policies>
+        <OnStartupTriggeringPolicy/>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="25 MB"/>
+      </Policies>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.eclipse.jetty" level="info" additivity="true"/>
+    <Logger name="org.jboss.resteasy" level="info" additivity="true"/>
+    <Logger name="org.jboss.resteasy.core.ExceptionHandler" level="off" additivity="true"/>
+    <Logger name="javax.jaxrs.rs" level="info" additivity="true"/>
+    <Logger name="org.jboss.resteasy.plugins.providers.DocumentProvider" level="warn" additivity="true"/>
+    <Logger name="com.geoffgranum" level="trace" additivity="true"/>
+    <Root level="info">
+      <AppenderRef ref="fileLogger"/>
+      <AppenderRef ref="allLogger"/>
+      <AppenderRef ref="consoleLogger"/>
+    </Root>
+  </Loggers>
+</Configuration>

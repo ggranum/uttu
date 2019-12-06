@@ -1,0 +1,128 @@
+/*
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2019 Geoff M. Granum 
+ */
+
+
+plugins {
+    id  'java'
+    id 'maven-publish'
+    id 'com.jfrog.bintray'
+}
+
+version = rootProject['project.version']
+group = 'com.geoffgranum.uttu'
+
+
+repositories {
+    maven {
+        url  "https://dl.bintray.com/ggranum/uttu"
+    }
+}
+
+dependencies {
+
+    implementation project(":core")
+    
+    implementation "commons-io:commons-io:${rootProject['versions.commonsIo']}"
+    implementation "org.apache.commons:commons-lang3:${rootProject['versions.commons-lang3']}"
+    implementation "org.apache.httpcomponents:httpcore:${rootProject['versions.httpcore']}"
+    implementation "commons-codec:commons-codec:${rootProject['versions.commonsCodec']}"
+
+    implementation "com.google.guava:guava:${rootProject['versions.guava']}"
+    implementation "com.google.code.findbugs:jsr305:${rootProject['versions.findbugs']}"
+
+    implementation "org.apache.logging.log4j:log4j-api:${rootProject['versions.log4j']}"
+    runtime "org.apache.logging.log4j:log4j-core:${rootProject['versions.log4j']}"
+    runtime "org.apache.logging.log4j:log4j-jcl:${rootProject['versions.log4j']}"
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${rootProject['versions.jackson']}"
+    implementation "org.hibernate:hibernate-validator:${rootProject['versions.hibernateValidator']}"
+
+
+    implementation ("org.jboss.resteasy:resteasy-jaxrs:${rootProject['versions.resteasy']}")
+    implementation  "org.jboss.resteasy:resteasy-jackson2-provider:${rootProject['versions.resteasy']}"
+    implementation "org.jboss.resteasy:resteasy-jsapi:${rootProject['versions.resteasy']}"
+    implementation ("org.jboss.resteasy:resteasy-guice:${rootProject['versions.resteasy']}") {
+        exclude module: 'guice'
+    }
+
+    implementation ("org.jboss.resteasy:resteasy-client:${rootProject['versions.resteasy']}")
+
+    testImplementation "org.testng:testng:${rootProject['versions.testNg']}"
+    testImplementation "org.mockito:mockito-core:${rootProject['versions.mockito']}"
+    testImplementation "org.hamcrest:hamcrest-all:${rootProject['versions.hamcrest']}"
+}
+
+javadoc.options({
+    addStringOption('tag', 'todo')
+})
+
+jar {
+    baseName = project.name
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+
+publishing {
+    publications {
+        binTrayPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            groupId group
+            artifactId project.name
+            version version
+            pom {
+                name = "uttu RestClient"
+                description = "Utilities for building RESTful and JSON client-server applications."
+                url = "git@github.com:ggranum/java-uttu"
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://github.com/ggranum/java-uttu"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "ggranum"
+                        name = "Geoff Granum"
+                        email = "maven@geoffgranum.com"
+                    }
+                }
+                scm {
+                    connection = "https://github.com/ggranum/java-uttu.git"
+                    developerConnection = "git@github.com:ggranum/java-uttu.git"
+                    url = "https://github.com/ggranum/java-uttu"
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = project['project.bintray.username']
+    key = project['project.bintray.apiKey']
+    publications = ['binTrayPublication']
+    publish = true
+    pkg {
+        repo = 'uttu'
+        name = project.name
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/ggranum/java-uttu.git'
+        version {
+            name = version
+            desc = 'Common utility code for client server projects'
+            released  = new Date()
+            vcsTag = version
+        }
+    }
+}

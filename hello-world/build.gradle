@@ -1,0 +1,56 @@
+/*
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2019 Geoff M. Granum
+ */
+plugins {
+    id 'java'
+    id 'war'
+    id 'idea'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+idea.module {
+    excludeDirs -= file(buildDir)
+    buildDir.listFiles({ d, f -> f != 'generated-sources' } as FilenameFilter).each { excludeDirs += it }
+    excludeDirs += [file('logs'), file('temp'), file('out')]
+}
+
+dependencies {
+
+    implementation project(":core"), project(":servlet")
+
+    implementation "com.fasterxml.jackson.core:jackson-databind:${rootProject['versions.jackson']}"
+
+    implementation "com.google.guava:guava:${rootProject['versions.guava']}"
+    implementation("com.google.inject:guice:${rootProject['versions.guice']}")
+    implementation "com.google.inject.extensions:guice-servlet:${rootProject['versions.guice']}"
+
+    implementation "org.apache.commons:commons-lang3:${rootProject['versions.commons-lang3']}"
+    implementation "org.apache.logging.log4j:log4j-api:${rootProject['versions.log4j']}"
+    implementation "org.apache.logging.log4j:log4j-core:${rootProject['versions.log4j']}"
+    implementation "org.apache.logging.log4j:log4j-jcl:${rootProject['versions.log4j']}"
+
+    implementation("org.hibernate:hibernate-validator:${rootProject['versions.hibernateValidator']}");
+
+    implementation "org.jboss.resteasy:resteasy-jaxrs:${rootProject['versions.resteasy']}"
+    implementation "org.jboss.resteasy:resteasy-client:${rootProject['versions.resteasy']}"
+    implementation "org.jboss.resteasy:resteasy-jackson2-provider:${rootProject['versions.resteasy']}"
+
+    implementation("org.jboss.resteasy:resteasy-guice:${rootProject['versions.resteasy']}") {
+        exclude module: 'guice'
+    }
+
+    implementation "org.eclipse.jetty:jetty-server:${rootProject['versions.jetty']}"
+    implementation "org.eclipse.jetty:jetty-servlet:${rootProject['versions.jetty']}"
+
+    runtime "org.apache.logging.log4j:log4j-slf4j-impl:${rootProject['versions.log4j']}"
+    runtime "org.slf4j:jcl-over-slf4j:${rootProject['versions.slf4j']}"
+
+}
+
+

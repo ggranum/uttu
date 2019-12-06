@@ -1,0 +1,7 @@
+{
+  "httpPort": 8080,
+  "someStringSet": [
+    "value 1",
+    "Value 2"
+  ]
+}

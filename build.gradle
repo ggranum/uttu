@@ -1,0 +1,98 @@
+/*
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2015 Geoff M. Granum
+ */
+
+import com.geoffgranum.gradle.BuildProps
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
+    }
+}
+
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = "5.3.1"
+}
+
+apply plugin: BuildProps
+
+
+buildProps.source("${project.rootDir}/gradle.local.properties")
+buildProps.required("build.env");
+buildProps.required(["project.version"])
+buildProps.required(["project.bintray.username"])
+buildProps.required(["project.bintray.apiKey"])
+
+
+buildProps.optional([])
+
+subprojects {
+    configurations.all({
+        exclude(module: 'slf4j-simple')
+        resolutionStrategy { ->
+            // fail eagerly on version conflict (includes transitive dependencies)
+            // e.g. multiple different versions of the same dependency (group and name are equal)
+            failOnVersionConflict()
+
+            // force certain versions of dependencies (including transitive)
+            //  This appends new forced modules:
+            force("org.hibernate:hibernate-validator:${rootProject['versions.hibernateValidator']}",
+                    "com.google.guava:guava:${rootProject['versions.guava']}",
+                    "commons-codec:commons-codec:${rootProject['versions.commonsCodec']}",
+                    "commons-lang:commons-lang3:${rootProject['versions.commons-lang3']}",
+                    "commons-io:commons-io:${rootProject['versions.commonsIo']}",
+                    "org.slf4j:slf4j-api:${rootProject['versions.slf4j']}",
+                    "com.google.code.findbugs:jsr305:${rootProject['versions.findbugs']}",
+                    "com.fasterxml.jackson.core:jackson-annotations:${rootProject['versions.jackson']}",
+                    "com.fasterxml.jackson.core:jackson-databind:${rootProject['versions.jackson']}",
+            )
+            //  This would replace existing forced modules with new ones:
+            //forcedModules = ['asm:asm-all:3.3.1']
+
+            // cache dynamic versions for 10 minutes
+            cacheDynamicVersionsFor 10 * 60, 'seconds'
+            // don't cache changing modules at all
+            cacheChangingModulesFor 0, 'seconds'
+        }
+    })
+
+    repositories {
+        mavenCentral()
+//        maven {
+//            url rootProject["yourRepo.url"]
+//            credentials {
+//                username = rootProject["yourRepo.username"]
+//                password = rootProject["yourRepo.password"]
+//            }
+//        }
+    }
+
+    configurations {
+        deployerJars // maven upload archive tasks
+    }
+
+    dependencies {
+        deployerJars 'org.apache.maven.wagon:wagon-http:2.2' // maven upload archive tasks
+    }
+
+
+}
+
+subprojects {
+
+    if(project.hasProperty('test')) {
+        test { ->
+            // enable TestNG support (default is JUnit)
+            useTestNG()
+            workingDir "${project.rootDir}/"
+        }
+    }
+}
+
+

@@ -1,0 +1,53 @@
+= Uttu Servlet
+
+A RESTEasy on Jetty based web service framework. Builds into an executable jar file.
+
+== Features
+
+ * SSL handling and cert generation scripts.
+ * Guice-based dependency injection
+ * Gradle builds.
+ * Real world configuration scanning - Command line, system environment properties, and per development stage configuration files. With local overrides.
+ * Client support
+ * Advanced logging via Log4J2
+ * Fantastic testing support
+ * No magic.
+
+
+
+== Getting started
+
+Uttu Servlet was designed for implementing Rest services. Yes, micro services too. We designed with the expectation of a three-module project:
+
+. App-Common
+. App-Client
+. App-Service
+
+You can see how to generate such a project for IntelliJ by examining the Gradle build for the uttu project. You'll need to borrow from settings.gradle, gradle.properties and the gradle.build files at the root project level, as well as the gradle.build files for each of your three child projects.
+
+
+=== Module expectations
+
+Each module serves a specific purpose.
+
+==== Common
+
+The common module will hold your shared interfaces and shared domain objects. You'll create any Resource interface here, and any Domain objects which will be consumed or provided by said Resources.
+
+For larger projects, you may want to included any utility code that both Client and Service will use in this Common module. For microservces, the expectation is that you'll have a number of these three-module projects, and a stand-alone 'Corporate-Common' project that you include via Gradle dependency management.
+
+==== Client
+
+The Client provides Java based access to your service endpoints. You'll implement your Resource interface(s) here, and also add your functional testing.
+
+
+This is a library project. You'll create a 'project dependency' on this module in your Service project build file, but you'll also generate a Jar file from the Client project. This Jar file can be distributed to consumers of your HTTP API, to save them the hassle of implementing their own client code from scratch.
+
+
+==== Service
+
+
+
+=== Setting up a new Service
+
+. Create a new Class that extends UttuApplication.

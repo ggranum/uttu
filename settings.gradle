@@ -1,0 +1,13 @@
+
+/*
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2015 Geoff M. Granum
+ */
+
+include "core",
+        "servlet",
+        "hello-world",
+        "restclient",
+        "core-example"
+

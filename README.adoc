@@ -1,0 +1,43 @@
+= Uttu: Build your web
+
+Embedded Jetty. Guice. RESTEasy. Jackson.
+
+Clean, fast, embeddable framework.
+
+== Use
+
+( Template GitHub Project coming soon... )
+
+* Add dependencies to your Gradle build file:
+
+[source]
+----
+dependencies {
+
+    implementation "com.geoff.granum.uttu:core:${rootProject['versions.uttu']
+    implementation "com.geoff.granum.uttu:servlet:${rootProject['versions.uttu']
+    // Generally one doesn't add uttu-servlet and uttu-restclient to the same sub-project.
+    // implementation "com.geoff.granum.uttu:restclient:${rootProject['versions.uttu']
+}
+----
+
+
+== What's here
+
+* Embedded Jetty Server container
+* Multi-stage, multi-source Application bootstrap. Set your config in JSON files, via Environment variables, or via startup arguments.
+* SSL handling and cert generation scripts.
+* Guice-based dependency injection
+* Ready for Gradle builds. Or possibly Maven, if you're still stuck on crappy XML based build tooling.
+* Real world configuration scanning - Command line, system environment properties, and per development stage configuration files. With local overrides.
+* Client support
+* Advanced logging via Log4J2
+* Fantastic testing support
+* No magic.
+* Builder Pattern (ExampleModel.java) generated via the [BuilderGenerator IntelliJ plugin](https://github.com/ggranum/java-builder-gen)
+* TestNG
+   * With Hamcrest and Mockito. Though, no examples of Mockito. Oops.
+* Log4j2
+* MIT Licensed
+* Portable, reusable domain knowledge. Very little custom, exclusive-to-Uttu learning required.
+
