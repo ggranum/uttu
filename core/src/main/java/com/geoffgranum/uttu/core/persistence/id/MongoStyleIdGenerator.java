@@ -7,6 +7,8 @@ package com.geoffgranum.uttu.core.persistence.id;
 
 import com.geoffgranum.uttu.core.log.Log;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.google.inject.Singleton;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
@@ -18,7 +20,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -72,6 +76,22 @@ public final class MongoStyleIdGenerator implements IdGenerator {
       throw new RuntimeException(e);
     }
     return id;
+  }
+
+  static byte[] toMongoDb(@Nonnull BigInteger id){
+    byte[] in = id.toByteArray();
+    byte[] out = new byte[12]; // Mongo is 12 bytes, we are 14.
+    long millis = Longs.fromBytes(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7]);
+    byte[] seconds = Ints.toByteArray((int)(millis/1000));
+    out[0] = seconds[0];
+    out[1] = seconds[1];
+    out[2] = seconds[2];
+    out[3] = seconds[3];
+
+    for (int i = 4; i < 12; i++) {
+      out[i] = in[i+2];
+    }
+    return out;
   }
 
   private static void checkForOverflow(AtomicInteger autoInc) {

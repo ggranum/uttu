@@ -94,7 +94,7 @@ bintray {
         repo = 'uttu'
         name = project.name
         licenses = ['MIT']
-        vcsUrl = 'https://github.com/ggranum/java-uttu.git'
+        vcsUrl = 'https://github.com/ggranum/uttu.git'
         version {
             name = version
             desc = 'Common utility code for client server projects'
