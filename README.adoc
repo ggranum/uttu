@@ -4,24 +4,6 @@ Embedded Jetty. Guice. RESTEasy. Jackson.
 
 Clean, fast, embeddable framework.
 
-== Use
-
-( Template GitHub Project coming soon... )
-
-* Add dependencies to your Gradle build file:
-
-[source]
-----
-dependencies {
-
-    implementation "com.geoff.granum.uttu:core:${rootProject['versions.uttu']
-    implementation "com.geoff.granum.uttu:servlet:${rootProject['versions.uttu']
-    // Generally one doesn't add uttu-servlet and uttu-restclient to the same sub-project.
-    // implementation "com.geoff.granum.uttu:restclient:${rootProject['versions.uttu']
-}
-----
-
-
 == What's here
 
 * Embedded Jetty Server container
@@ -40,4 +22,36 @@ dependencies {
 * Log4j2
 * MIT Licensed
 * Portable, reusable domain knowledge. Very little custom, exclusive-to-Uttu learning required.
+
+
+
+== Use
+
+( Template GitHub Project coming soon... )
+
+=== Project structure
+
+It is completely possible to structure your application into a single project
+
+'''
+
+* Add dependencies to your Gradle build file:
+
+[source]
+----
+
+repositories {
+	maven {
+		url  "https://dl.bintray.com/ggranum/uttu"
+	}
+}
+
+dependencies {
+
+    implementation "com.geoffgranum.uttu:core:${rootProject['versions.uttu']}"
+    implementation "com.geoffgranum.uttu:servlet:${rootProject['versions.uttu']}"
+    // Generally one doesn't add uttu-servlet and uttu-restclient to the same sub-project.
+    // implementation "com.geoffgranum.uttu:restclient:${rootProject['versions.uttu']}"
+}
+----
 

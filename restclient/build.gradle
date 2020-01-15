@@ -84,11 +84,11 @@ publishing {
             pom {
                 name = "uttu RestClient"
                 description = "Utilities for building RESTful and JSON client-server applications."
-                url = "git@github.com:ggranum/java-uttu"
+                url = "git@github.com:ggranum/uttu"
                 licenses {
                     license {
                         name = "MIT"
-                        url = "https://github.com/ggranum/java-uttu"
+                        url = "https://github.com/ggranum/uttu"
                     }
                 }
                 developers {
@@ -99,9 +99,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "https://github.com/ggranum/java-uttu.git"
-                    developerConnection = "git@github.com:ggranum/java-uttu.git"
-                    url = "https://github.com/ggranum/java-uttu"
+                    connection = "https://github.com/ggranum/uttu.git"
+                    developerConnection = "git@github.com:ggranum/uttu.git"
+                    url = "https://github.com/ggranum/uttu"
                 }
             }
         }
@@ -117,7 +117,7 @@ bintray {
         repo = 'uttu'
         name = project.name
         licenses = ['MIT']
-        vcsUrl = 'https://github.com/ggranum/java-uttu.git'
+        vcsUrl = 'https://github.com/ggranum/uttu.git'
         version {
             name = version
             desc = 'Common utility code for client server projects'
