@@ -5,8 +5,8 @@
  */
 plugins {
     id 'java'
-    id 'war'
     id 'idea'
+    id 'application'
 }
 
 repositories {

@@ -7,9 +7,11 @@ package com.geoffgranum.uttu.core.persistence.id;
 
 import com.geoffgranum.uttu.core.log.Log;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import com.google.inject.Singleton;
+
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.ThreadSafe;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
@@ -20,19 +22,15 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Id generally of the form described here: http://www.mongodb.org/display/DOCS/Object+IDs
  * <p>
- * However, uses full 8 bytes for time field instead of the 4 full Long.
+ * However, uses full 8 bytes of a long for time field instead of the 4 of an integer.
  * <p>
- * [00][01][02][03][04][05][06][07][08][09][10][11][12][13][14][15]
- * | time                         |   machine |  pid  | inc       |
+ * [00][01][02][03][04][05][06][07]   [08][09][10]   [11][12]   [13][14][15]
+ * | time(8)                         | machine(3)   | pid(2)  |  inc(3)      |
  * 8 Bytes for time (current time in millis)
  * 3 Bytes for machine ID
  * 2 Bytes for process ID
@@ -79,19 +77,7 @@ public final class MongoStyleIdGenerator implements IdGenerator {
   }
 
   static byte[] toMongoDb(@Nonnull BigInteger id){
-    byte[] in = id.toByteArray();
-    byte[] out = new byte[12]; // Mongo is 12 bytes, we are 14.
-    long millis = Longs.fromBytes(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7]);
-    byte[] seconds = Ints.toByteArray((int)(millis/1000));
-    out[0] = seconds[0];
-    out[1] = seconds[1];
-    out[2] = seconds[2];
-    out[3] = seconds[3];
-
-    for (int i = 4; i < 12; i++) {
-      out[i] = in[i+2];
-    }
-    return out;
+   return TypedId.asMongo(id);
   }
 
   private static void checkForOverflow(AtomicInteger autoInc) {
