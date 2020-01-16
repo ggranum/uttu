@@ -6,8 +6,8 @@
  */
 
 include "core",
+        "iam",
+        "restclient",
         "servlet",
         "hello-world",
-        "restclient",
         "core-example"
-
