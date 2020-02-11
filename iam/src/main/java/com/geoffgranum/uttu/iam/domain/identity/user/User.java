@@ -208,7 +208,7 @@ public class User implements Identified {
     }
 
     public User create(IdGenerator idGen) {
-      this.id(idGen.nextId(UserId.class));
+      this.id(idGen.nextConcrete(UserId.class));
       return build();
     }
 
