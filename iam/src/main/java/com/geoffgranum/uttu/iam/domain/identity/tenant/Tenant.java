@@ -7,7 +7,6 @@ package com.geoffgranum.uttu.iam.domain.identity.tenant;
 
 
 import com.geoffgranum.uttu.core.base.Verify;
-import com.geoffgranum.uttu.core.persistence.id.IdGenerator;
 import com.geoffgranum.uttu.core.persistence.id.Identified;
 import com.geoffgranum.uttu.iam.domain.access.registration.InvitationDescriptor;
 import com.geoffgranum.uttu.iam.domain.access.registration.RegistrationInvitation;
@@ -253,8 +252,8 @@ public final class Tenant implements Identified {
       return this;
     }
 
-    public Tenant create(IdGenerator gen) {
-      id(new TenantId(gen.nextId()));
+    public Tenant build(TenantId nextId) {
+      id(nextId);
       return this.build();
     }
 

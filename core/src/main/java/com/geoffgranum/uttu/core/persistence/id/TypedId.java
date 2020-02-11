@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class TypedId<T> implements Identifier, Comparable<TypedId<T>>, Serializable {
+public class TypedId<T extends Identified> implements Identifier, Comparable<TypedId<T>>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
