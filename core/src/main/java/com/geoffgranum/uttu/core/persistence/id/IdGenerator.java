@@ -6,6 +6,7 @@
 package com.geoffgranum.uttu.core.persistence.id;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 
 /**
@@ -25,16 +26,45 @@ public interface IdGenerator {
    * @return A new, unique id.
    */
   @Nonnull
-  BigInteger nextId();
+  BigInteger next();
 
   @Nonnull
-  <T extends TypedId<?>> T nextId(Class<T> type);
+  default <T extends Identified> TypedId<T> next(Class<T> type) {
+    return new TypedId<T>(next());
+  }
+
+  /**
+   * Provided a unique Id for concrete subclasses of TypedId.
+   *
+   * @param type The ID Type.
+   * @param <T>  The datatype to which the returned ID will belong.
+   * @return A new instance of T.
+   */
+  @Nonnull
+  default <T extends TypedId<?>> T nextConcrete(Class<T> type) {
+    T id;
+    try {
+      @SuppressWarnings("rawtypes") Constructor constructor = type.getConstructor(BigInteger.class);
+      id = type.cast(constructor.newInstance(next()));
+    } catch (Exception e) {
+      /* Unless TypedId gets modified this won't happen. */
+      throw new RuntimeException(e);
+    }
+    return id;
+  }
 
   /**
    * Mongo uses 12 bytes, our default generator uses 16. Our timestamp is millisecond resolution, Mongo's is 1 second.
    * This method must return a hex string that can be accepted by MongoDb's 'new ObjectId(String hex)' constructor.
+   * <p>
+   * While MongoDB is a special case, it, or API compatible clones (e.g. Azure Cosmos), is fairly pervasive.
    */
   @Nonnull
   String asMongo(BigInteger id);
+
+  @Nonnull
+  default String asMongo(TypedId<?> id) {
+    return asMongo(id.value());
+  }
 
 }

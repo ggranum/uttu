@@ -29,7 +29,7 @@ public class DefaultIdGeneratorTest {
   public void testCanConvertToMongoStyleByteArray() throws Exception {
     int now = (int) (System.currentTimeMillis() / 1000);
     DefaultIdGenerator idGen = new DefaultIdGenerator();
-    String mongoId = idGen.asMongo(idGen.nextId());
+    String mongoId = idGen.asMongo(idGen.next());
     assertThat(mongoId.length(), is(24));
     // Reads the int from the beginning of the array, so it is in fact the time.
     int seconds = Ints.fromByteArray(Hex.decodeHex(mongoId.toCharArray()));

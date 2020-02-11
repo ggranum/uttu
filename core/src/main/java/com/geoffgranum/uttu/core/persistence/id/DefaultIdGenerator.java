@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -128,7 +127,7 @@ public final class DefaultIdGenerator implements IdGenerator {
 
   @Override
   @Nonnull
-  public BigInteger nextId() {
+  public BigInteger next() {
     int nextAuto;
     synchronized (autoInc) {
       nextAuto = autoInc.getAndIncrement();
@@ -143,20 +142,6 @@ public final class DefaultIdGenerator implements IdGenerator {
     // copy lower-order bytes from the int as the auto increment value
     insertAsBytes(nextAuto, 1, bytes, 13, 3);
     return new BigInteger(bytes);
-  }
-
-  @Override
-  @Nonnull
-  public <T extends TypedId<?>> T nextId(Class<T> type) {
-    T id;
-    try {
-      @SuppressWarnings("rawtypes") Constructor constructor = type.getConstructor(BigInteger.class);
-      id = type.cast(constructor.newInstance(nextId()));
-    } catch (Exception e) {
-      /* Unless TypedId gets modified this won't happen. */
-      throw new RuntimeException(e);
-    }
-    return id;
   }
 
   @Nonnull
