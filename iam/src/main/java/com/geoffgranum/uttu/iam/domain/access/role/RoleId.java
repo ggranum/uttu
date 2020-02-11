@@ -3,21 +3,22 @@
  *
  * Copyright (c) 2015 Geoff M. Granum
  */
+package com.geoffgranum.uttu.iam.domain.access.role;
 
-package com.geoffgranum.uttu.iam.domain.authentication;
-
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.geoffgranum.uttu.core.persistence.id.Identifier;
 
 import javax.annotation.concurrent.Immutable;
 import java.math.BigInteger;
 
+/**
+ * @author Geoff M. Granum
+ */
 @Immutable
-public final class TenantId implements Identifier {
+public final class RoleId implements Identifier {
 
   public final BigInteger value;
 
-  public TenantId(BigInteger value) {
+  public RoleId(BigInteger value) {
     this.value = value;
   }
 
@@ -29,8 +30,9 @@ public final class TenantId implements Identifier {
   @Override
   public boolean equals(Object o) {
     boolean objectsEqual = false;
+
     if (o != null && this.getClass() == o.getClass()) {
-      TenantId that = (TenantId) o;
+      RoleId that = (RoleId) o;
       objectsEqual = value.equals(that.value);
     }
     return objectsEqual;
@@ -41,9 +43,9 @@ public final class TenantId implements Identifier {
     return value.hashCode();
   }
 
-  @JsonValue
   @Override
   public String toString() {
     return value.toString();
   }
 }
+ 

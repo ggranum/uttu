@@ -5,24 +5,22 @@
  */
 package com.geoffgranum.uttu.iam.domain.access;
 
-import java.math.BigInteger;
+import com.geoffgranum.uttu.core.persistence.id.Identified;
+import com.geoffgranum.uttu.core.persistence.id.Identifier;
 
-public class Permission {
+public class Permission implements Identified {
 
-  private final BigInteger id;
-  private final String name;
+  public final PermissionId id;
+  public final String name;
 
-  public Permission(BigInteger id, String name) {
+  public Permission(PermissionId id, String name) {
     this.id = id;
     this.name = name;
   }
 
-  public BigInteger getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
+  @Override
+  public Identifier id() {
+    return null;
   }
 }
  

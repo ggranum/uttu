@@ -9,49 +9,59 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public abstract class TypedId<T> implements Comparable<TypedId<T>>, Serializable {
+public class TypedId<T> implements Identifier, Comparable<TypedId<T>>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @JsonProperty
   private final BigInteger id;
 
-  public TypedId(String stringId) {
-    this(new BigInteger(stringId));
+  public TypedId(@Nonnull String hexId) {
+    this(new BigInteger(hexId, 16));
   }
 
-  public TypedId(BigInteger id) {
+  public TypedId(@Nonnull BigInteger id) {
     this.id = id;
   }
 
   /**
-   * Mongo uses 12 bytes, we use 14, as our timestamp is millisecond resolution, theirs is 1 second resolution.
+   * The (up to) 16 byte value that is our identifier.
+   *
+   * @return A valid identifier.
    */
-  public static @Nonnull
-  byte[] asMongo(@Nonnull BigInteger id) {
-    byte[] in = id.toByteArray();
-    byte[] out = new byte[12]; // Mongo is 12 bytes, we are 14.
-    long millis = Longs.fromBytes(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7]);
-    byte[] seconds = Ints.toByteArray((int) (millis / 1000));
-    out[0] = seconds[0];
-    out[1] = seconds[1];
-    out[2] = seconds[2];
-    out[3] = seconds[3];
-    System.arraycopy(in, 6, out, 4, 8);
-    return out;
+  @Nonnull
+  public BigInteger value() {
+    return id;
   }
 
-  public byte[] asMongo() {
-    return TypedId.asMongo(this.id);
+
+  @Nonnull
+  public String toString() {
+    return String.format("%s:%s", getClass().getSimpleName(), toHexString());
   }
+
+  /**
+   * Convenience method for clarity. Provides the hexadecimal value of this identifier.
+   * It is NOT possible to reconstruct which Class this identifier was generated with from the value returned by this method.
+   *
+   * @return A valid JSON representation of this ID.
+   */
+  @Nonnull
+  public String toJson() {
+    return toHexString();
+  }
+
+  @Nonnull
+  public String toHexString() {
+    return id.toString(16);
+  }
+
 
   @Override
   public boolean equals(Object o) {
@@ -78,24 +88,16 @@ public abstract class TypedId<T> implements Comparable<TypedId<T>>, Serializable
     return this.id.compareTo(o.id);
   }
 
-  public String toString() {
-    return String.format("%s:%s", getClass().getSimpleName(), String.valueOf(id));
-  }
 
-  public BigInteger value() {
-    return id;
-  }
-
-
-  public static class TypedIdSerializer<T extends TypedId> extends StdSerializer<T> {
+  public static class TypedIdSerializer<T extends TypedId<?>> extends StdSerializer<T> {
 
     public TypedIdSerializer(Class<T> idType) {
       super(idType);
     }
 
     @Override
-    public void serialize(T value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-      jgen.writeString(value.value().toString());
+    public void serialize(T identifier, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+      jgen.writeString(identifier.toJson());
     }
   }
 }

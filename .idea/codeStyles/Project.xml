@@ -22,6 +22,7 @@
       <option name="INDENT_SEQUENCE_VALUE" value="false" />
     </yaml>
     <codeStyleSettings language="JAVA">
+      <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
       <indentOptions>
         <option name="INDENT_SIZE" value="2" />
         <option name="CONTINUATION_INDENT_SIZE" value="4" />

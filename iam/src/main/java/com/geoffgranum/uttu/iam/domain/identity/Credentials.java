@@ -4,7 +4,7 @@
  * Copyright (c) 2015 Geoff M. Granum
  */
 
-package com.geoffgranum.uttu.iam.domain.authentication;
+package com.geoffgranum.uttu.iam.domain.identity;
 
 public abstract class Credentials {
 
