@@ -1,6 +1,5 @@
 package com.geoffgranum.uttu.mongodb;
 
-import com.geoffgranum.uttu.core.persistence.id.IdGenerator;
 import com.geoffgranum.uttu.core.persistence.id.TypedId;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -22,7 +21,7 @@ public class TypedIdCodec implements Codec<TypedId> {
 
   @Override
   public void encode(final BsonWriter writer, final TypedId id, final EncoderContext encoderContext) {
-    writer.writeObjectId(new ObjectId(id.toHexString(objectIdByteCount)));
+    writer.writeObjectId(new ObjectId(id.toHex(objectIdByteCount)));
   }
 
   @Override

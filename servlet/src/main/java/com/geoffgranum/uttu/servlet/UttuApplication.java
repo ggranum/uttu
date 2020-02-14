@@ -14,15 +14,8 @@ import java.io.FileInputStream;
 import java.util.EnumSet;
 import java.util.Properties;
 import javax.servlet.DispatcherType;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.LowResourceMonitor;
-import org.eclipse.jetty.server.NCSARequestLog;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
+
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -33,6 +26,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+
+import static org.eclipse.jetty.server.CustomRequestLog.EXTENDED_NCSA_FORMAT;
 
 /**
  * @author ggranum
@@ -92,14 +87,13 @@ public abstract class UttuApplication {
     server.setHandler(stats);
 
     // === jetty-requestlog.xml ===
-    NCSARequestLog requestLog = new NCSARequestLog();
-    requestLog.setFilename(jettyHomeDir.getPath() + "/log/yyyy_mm_dd.request.log");
-    requestLog.setFilenameDateFormat("yyyy_MM_dd");
-    requestLog.setRetainDays(90);
-    requestLog.setAppend(true);
-    requestLog.setExtended(true);
-    requestLog.setLogCookies(false);
-    requestLog.setLogTimeZone("GMT");
+//    CustomRequestLog#EXTENDED_NCSA_FORMAT} with a {@link RequestLogWriter
+    RequestLogWriter logWriter = new RequestLogWriter(jettyHomeDir.getPath() + "/log/yyyy_mm_dd.request.log");
+    logWriter.setFilenameDateFormat("yyyy_MM_dd");
+    logWriter.setRetainDays(90);
+    logWriter.setAppend(true);
+    logWriter.setTimeZone("GMT");
+    CustomRequestLog requestLog = new CustomRequestLog(logWriter, EXTENDED_NCSA_FORMAT);
     RequestLogHandler requestLogHandler = new RequestLogHandler();
     requestLogHandler.setRequestLog(requestLog);
     handlers.addHandler(requestLogHandler);
