@@ -125,14 +125,29 @@ public final class DefaultIdGenerator implements IdGenerator {
     }
   }
 
+  @Nonnull
+  @Override
+  public String nextHex() {
+    byte[] bytes;
+    synchronized (autoInc) {
+      bytes = nextBytes();
+    }
+    return Hex.encodeHexString(bytes);
+  }
+
   @Override
   @Nonnull
   public BigInteger next() {
-    int nextAuto;
+    byte[] bytes;
     synchronized (autoInc) {
-      nextAuto = autoInc.getAndIncrement();
-      checkForOverflow(autoInc);
+      bytes = nextBytes();
     }
+    return new BigInteger(bytes);
+  }
+
+  private byte[] nextBytes() {
+    int nextAuto = autoInc.getAndIncrement();
+    checkForOverflow(autoInc);
     byte[] bytes = new byte[16];
     long millis = System.currentTimeMillis();
     insertAsBytes(millis, bytes);
@@ -141,27 +156,10 @@ public final class DefaultIdGenerator implements IdGenerator {
     System.arraycopy(processIdHash, 0, bytes, 11, 2);
     // copy lower-order bytes from the int as the auto increment value
     insertAsBytes(nextAuto, 1, bytes, 13, 3);
-    return new BigInteger(bytes);
+    return bytes;
   }
 
-  @Nonnull
-  @Override
-  public String asMongo(BigInteger id) {
-    int size = 16;
-    byte[] in = id.toByteArray();
-    // BigInteger#toByteArray() will truncate leading zeros. We have to add them back in by checking the difference
-    // in the returned array size and the required 16 bytes we created the BigInteger with in the first place.
-    byte[] full = new byte[size];
-    System.arraycopy(in, 0, full, size - in.length, in.length);
-    byte[] out = new byte[12]; // Mongo is 12 bytes, we are 16.
-    long millis = Longs.fromBytes(full[0], full[1], full[2], full[3], full[4], full[5], full[6], full[7]);
-    byte[] seconds = Ints.toByteArray((int) (millis / 1000));
-    out[0] = seconds[0];
-    out[1] = seconds[1];
-    out[2] = seconds[2];
-    out[3] = seconds[3];
-    System.arraycopy(in, 6, out, 4, 8);
-    return Hex.encodeHexString(out);
-  }
+
+
 }
  

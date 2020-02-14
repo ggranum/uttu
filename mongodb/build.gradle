@@ -1,0 +1,107 @@
+/*
+ * This software is licensed under the MIT License.
+ *
+ * Copyright (c) 2015 Geoff M. Granum
+ */
+plugins {
+    id  'java'
+    id 'maven-publish'
+    id 'com.jfrog.bintray'
+}
+
+version = rootProject['project.version']
+group = 'com.geoffgranum.uttu'
+
+
+repositories {
+    maven {
+        url  "https://dl.bintray.com/ggranum/uttu"
+    }
+}
+
+
+dependencies {
+
+    implementation project(":core")
+
+    implementation "commons-io:commons-io:${project['versions.commonsIo']}"
+    implementation "commons-codec:commons-codec:${project['versions.commonsCodec']}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${project['versions.jackson']}"
+
+    implementation "org.mongodb:mongodb-driver-sync:${rootProject['versions.mongo']}"
+
+
+    implementation "com.google.code.findbugs:jsr305:${project['versions.findbugs']}"
+    implementation "com.google.guava:guava:${project['versions.guava']}"
+    implementation "com.google.inject:guice:${rootProject['versions.guice']}"
+
+    implementation "org.apache.commons:commons-lang3:${project['versions.commons-lang3']}"
+    implementation "org.apache.httpcomponents:httpcore:${project['versions.httpcore']}"
+
+    implementation "org.apache.logging.log4j:log4j-api:${project['versions.log4j']}"
+    runtime "org.apache.logging.log4j:log4j-core:${project['versions.log4j']}"
+    runtime "org.apache.logging.log4j:log4j-jcl:${project['versions.log4j']}"
+
+    implementation "org.hibernate.validator:hibernate-validator:${project['versions.hibernateValidator']}"
+
+
+    testImplementation "org.testng:testng:${project['versions.testNg']}"
+    testImplementation "org.mockito:mockito-core:${project['versions.mockito']}"
+    testImplementation "org.hamcrest:hamcrest-all:${project['versions.hamcrest']}"
+}
+
+javadoc.options({
+    addStringOption('tag', 'todo')
+})
+
+jar {
+    archiveBaseName.set(project.name)
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+
+publishing {
+    publications {
+        binTrayPublication(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+            groupId group
+            artifactId project.name
+            version version
+        }
+
+        archives(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+        }
+    }
+}
+
+
+
+bintray {
+    user = project['project.bintray.username']
+    key = project['project.bintray.apiKey']
+    publications = ['binTrayPublication']
+    publish = true
+    pkg {
+        repo = 'uttu'
+        name = project.name
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/ggranum/uttu.git'
+        version {
+            name = version
+            desc = 'Common utility code for client server projects'
+            released  = new Date()
+            vcsTag = version
+        }
+    }
+}
