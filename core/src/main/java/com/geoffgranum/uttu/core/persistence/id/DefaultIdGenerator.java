@@ -7,8 +7,6 @@ package com.geoffgranum.uttu.core.persistence.id;
 
 import com.geoffgranum.uttu.core.log.Log;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import com.google.inject.Singleton;
 import org.apache.commons.codec.binary.Hex;
 
@@ -43,10 +41,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Immutable
 public final class DefaultIdGenerator implements IdGenerator {
 
-  private static final int THREE_BYTE_INT_MAX_VALUE = 1677216;
+  public static final  int DefaultIdByteCount = 16;
+  private static final int ThreeByteIntMaxValue = 1677216;
   private static final byte[] processIdHash = processIdHash();
   private static final byte[] machineIdHash = machineIdHash();
-  private final AtomicInteger autoInc = new AtomicInteger((int) (Math.random() * THREE_BYTE_INT_MAX_VALUE));
+  private final AtomicInteger autoInc = new AtomicInteger((int) (Math.random() * ThreeByteIntMaxValue));
 
   /**
    * Only called if, for some odd reason, the call to NetworkInterface.getByInetAddress fails.
@@ -71,7 +70,7 @@ public final class DefaultIdGenerator implements IdGenerator {
   }
 
   private static void checkForOverflow(AtomicInteger autoInc) {
-    if (autoInc.get() >= THREE_BYTE_INT_MAX_VALUE) {
+    if (autoInc.get() >= ThreeByteIntMaxValue) {
       Log.trace(DefaultIdGenerator.class, "AutoInc field rolled over to 0.");
       autoInc.set(0);
     }
@@ -133,6 +132,10 @@ public final class DefaultIdGenerator implements IdGenerator {
       bytes = nextBytes();
     }
     return Hex.encodeHexString(bytes);
+  }
+
+  @Override public int idByteLength() {
+    return DefaultIdByteCount;
   }
 
   @Override

@@ -17,11 +17,17 @@ import java.math.BigInteger;
  * @author ggranum
  */
 public class MongoIdGenerator implements IdGenerator {
+  public  static final int objectIdByteCount = 12;
+
 
   @Override
   @Nonnull
   public String nextHex() {
     return new ObjectId().toHexString();
+  }
+
+  @Override public int idByteLength() {
+    return objectIdByteCount;
   }
 
   @Override

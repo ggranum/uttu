@@ -73,7 +73,7 @@ public class TenantProvisioningService {
         .description(tenantDescription)
         .serverHostname(tenantServerHostname)
         .active(true)
-        .build(idGen.nextConcrete(TenantId.class));
+        .build(new TenantId(idGen.next()));
 
     this.tenantRepository.add(tenant);
 

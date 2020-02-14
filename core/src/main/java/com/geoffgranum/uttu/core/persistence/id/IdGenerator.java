@@ -5,10 +5,7 @@
  */
 package com.geoffgranum.uttu.core.persistence.id;
 
-import org.apache.commons.codec.binary.Hex;
-
 import javax.annotation.Nonnull;
-import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 
 /**
@@ -44,30 +41,31 @@ public interface IdGenerator {
   @Nonnull
   String nextHex();
 
+  /**
+   * BigInteger truncates leading zeros, so if an id is constructed out of sets of byte arrays, reconstructing that
+   * array becomes difficult unless we track the original length.
+   * @return The number of bytes that went into the construction of the BigInteger identifier.
+   */
+  int idByteLength();
+
+  /**
+   * Returns the un-truncated hex value of the `id` provided.
+   *
+   * @param id An id backed by a BigInteger value.
+   * @return The hex string representation, including any leading zero values that the BigInteger value may have
+   * truncated.
+   */
+  default String toHex(TypedId<?> id) {
+    return id.toHex(this.idByteLength());
+  }
+
+  default byte[] toBytes(TypedId<?> id) {
+    return id.toBytes(this.idByteLength());
+  }
 
   @Nonnull
   default <T extends Identified> TypedId<T> next(Class<T> type) {
     return new TypedId<T>(next());
-  }
-
-  /**
-   * Provided a unique Id for concrete subclasses of TypedId.
-   *
-   * @param type The ID Type.
-   * @param <T>  The datatype to which the returned ID will belong.
-   * @return A new instance of T.
-   */
-  @Nonnull
-  default <T extends TypedId<?>> T nextConcrete(Class<T> type) {
-    T id;
-    try {
-      @SuppressWarnings("rawtypes") Constructor constructor = type.getConstructor(BigInteger.class);
-      id = type.cast(constructor.newInstance(next()));
-    } catch (Exception e) {
-      /* Unless TypedId gets modified this won't happen. */
-      throw new RuntimeException(e);
-    }
-    return id;
   }
 
 }

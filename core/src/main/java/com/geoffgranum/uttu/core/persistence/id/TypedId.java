@@ -43,7 +43,7 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
 
   @Nonnull
   public String toString() {
-    return String.format("%s:%s", getClass().getSimpleName(), toHexString());
+    return String.format("%s:%s", getClass().getSimpleName(), toHex());
   }
 
   /**
@@ -55,22 +55,40 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
    */
   @Nonnull
   public String toJson() {
-    return toHexString();
+    return toHex();
   }
 
+  /**
+   * Take care when using identifiers that are made of of sets of byte arrays that are then concatenated into a single
+   * array: BigInteger truncates values.
+   * @return
+   */
   @Nonnull
-  public String toHexString() {
+  public String toHex() {
     return id.toString(16);
   }
 
   /**
+   * You probably want IdGenerator#toHex(TypedId) instead of this method.
    * BigInteger will truncate leading zeros.
    * @param untruncatedLength The original, known byte length of the generated BigInteger value. Must be greater than
    *                          or equal to the actual value of `id`.
    * @return A hexadecimal string of `untruncatedLength` bytes.
    */
   @Nonnull
-  public String toHexString(int untruncatedLength) {
+  public String toHex(int untruncatedLength) {
+    byte[] allBytes = toBytes(untruncatedLength);
+    return Hex.encodeHexString(allBytes);
+  }
+
+  /**
+   * You probably want IdGenerator#toBytes(TypedId) instead of this method.
+   * BigInteger will truncate leading zeros.
+   * @param untruncatedLength The original, known byte length of the generated BigInteger value. Must be greater than
+   *                          or equal to the actual value of `id`.
+   * @return A byte array `untruncatedLength` bytes.
+   */
+  public byte[] toBytes(int untruncatedLength) {
     byte[] in = id.toByteArray();
     if (in.length > untruncatedLength) {
       throw new IllegalArgumentException("Truncating Identifiers is not supported. Untruncated length must be less than or equal to actual identifier length.");
@@ -80,7 +98,7 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
     byte[] allBytes = new byte[untruncatedLength];
     int startAt = untruncatedLength - in.length;
     System.arraycopy(in, 0, allBytes, startAt, in.length);
-    return Hex.encodeHexString(allBytes);
+    return allBytes;
   }
 
   @Override
@@ -107,6 +125,7 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
   public int compareTo(TypedId<T> o) {
     return this.id.compareTo(o.id);
   }
+
 
 
   public static class TypedIdSerializer<T extends TypedId<?>> extends StdSerializer<T> {
