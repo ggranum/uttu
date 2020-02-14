@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
   }
 
   /**
-   * The (up to) 16 byte value that is our identifier.
+   * The value that is our identifier.
    *
    * @return A valid identifier.
    */
@@ -40,7 +41,6 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
     return id;
   }
 
-
   @Nonnull
   public String toString() {
     return String.format("%s:%s", getClass().getSimpleName(), toHexString());
@@ -48,7 +48,8 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
 
   /**
    * Convenience method for clarity. Provides the hexadecimal value of this identifier.
-   * It is NOT possible to reconstruct which Class this identifier was generated with from the value returned by this method.
+   * It is NOT possible to reconstruct which Class this identifier was generated with from the value returned by this
+   * method.
    *
    * @return A valid JSON representation of this ID.
    */
@@ -62,6 +63,25 @@ public class TypedId<T extends Identified> implements Identifier, Comparable<Typ
     return id.toString(16);
   }
 
+  /**
+   * BigInteger will truncate leading zeros.
+   * @param untruncatedLength The original, known byte length of the generated BigInteger value. Must be greater than
+   *                          or equal to the actual value of `id`.
+   * @return A hexadecimal string of `untruncatedLength` bytes.
+   */
+  @Nonnull
+  public String toHexString(int untruncatedLength) {
+    byte[] in = id.toByteArray();
+    if (in.length > untruncatedLength) {
+      throw new IllegalArgumentException("Truncating Identifiers is not supported. Untruncated length must be less than or equal to actual identifier length.");
+    }
+    // BigInteger#toByteArray() will truncate leading zeros. We have to add them back in by checking the difference
+    // in the returned array size and the required `untruncatedLength` bytes we created the BigInteger with in the first place.
+    byte[] allBytes = new byte[untruncatedLength];
+    int startAt = untruncatedLength - in.length;
+    System.arraycopy(in, 0, allBytes, startAt, in.length);
+    return Hex.encodeHexString(allBytes);
+  }
 
   @Override
   public boolean equals(Object o) {
