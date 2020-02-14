@@ -23,6 +23,7 @@ wrapper {
 apply plugin: BuildProps
 
 
+
 buildProps.source("${project.rootDir}/gradle.local.properties")
 buildProps.required("build.env");
 buildProps.required(["project.version"])
@@ -32,7 +33,18 @@ buildProps.required(["project.bintray.apiKey"])
 
 buildProps.optional([])
 
+
+
 subprojects {
+
+    plugins.withId('java', { _ ->
+        sourceCompatibility = JavaVersion.VERSION_12
+        targetCompatibility = JavaVersion.VERSION_12
+    })
+
+
+
+
     configurations.all({
         exclude(module: 'slf4j-simple')
         resolutionStrategy { ->
