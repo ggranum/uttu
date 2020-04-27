@@ -72,7 +72,7 @@ public class VersionInfo {
     public Builder fromVersionString(String versionString) {
       Verify.isNotEmpty(versionString, "Version String cannot be empty.");
 
-      String[] tokens = versionString.split("[.-]");
+      String[] tokens = versionString.trim().split("[.-]");
       Verify.isTrue(tokens.length > 2, IllegalStateException.class,
                     "Version number must be of the form 'a.b.c.[d[-e]]', where a,b,c and d are all numeric and " +
                     "represent major, minor, point and build number, respectively. 'e' is optional and may be a string" +
