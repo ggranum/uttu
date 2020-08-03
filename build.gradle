@@ -76,13 +76,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-//        maven {
-//            url rootProject["yourRepo.url"]
-//            credentials {
-//                username = rootProject["yourRepo.username"]
-//                password = rootProject["yourRepo.password"]
-//            }
-//        }
     }
 
     configurations {
@@ -92,8 +85,6 @@ subprojects {
     dependencies {
         deployerJars 'org.apache.maven.wagon:wagon-http:2.2' // maven upload archive tasks
     }
-
-
 }
 
 subprojects {
