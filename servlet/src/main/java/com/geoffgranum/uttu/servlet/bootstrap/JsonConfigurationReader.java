@@ -51,8 +51,8 @@ public class JsonConfigurationReader {
 
   private final Env env;
   private final ObjectMapper mapper;
-  private final StringSubstitutor envSub = new StringSubstitutor(System.getenv());
-  private final StringSubstitutor sysPropSub = new StringSubstitutor(asMap(System.getProperties()));
+  private final StringSubstitutor envSub = new StringSubstitutor(System.getenv(), "${env:", "}");
+  private final StringSubstitutor sysPropSub = new StringSubstitutor(asMap(System.getProperties()), "${sys:", "}");
 
   @Nonnull
   private Map<String, String> asMap(Properties properties) {
