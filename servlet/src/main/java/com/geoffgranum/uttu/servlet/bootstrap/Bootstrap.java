@@ -131,7 +131,10 @@ public final class Bootstrap {
         String versionString = IOUtils.toString(stream, StandardCharsets.UTF_8);
         versionInfo = new VersionInfo.Builder().fromVersionString(versionString).build();
       } catch (IOException e) {
-        throw new FatalException(e, "Could not read version from file at path %s.", versionFile.getAbsolutePath());
+        Log.warn(getClass(),
+                "Could not read 'version.number' file found at path %s. Providing a valid version for your application is highly recommended",
+                versionFile.getAbsolutePath());
+        versionInfo = new VersionInfo.Builder().fromVersionString("0.0.0-MISSING").build();
       }
     }
     return versionInfo;
