@@ -9,13 +9,17 @@ package com.geoffgranum.uttu.servlet.bootstrap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geoffgranum.uttu.core.base.Verify;
 import com.geoffgranum.uttu.core.exception.FatalException;
-import org.apache.logging.log4j.core.lookup.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 /**
@@ -47,8 +51,17 @@ public class JsonConfigurationReader {
 
   private final Env env;
   private final ObjectMapper mapper;
-  private final StrSubstitutor envSub = new StrSubstitutor(System.getenv());
-  private final StrSubstitutor sysPropSub = new StrSubstitutor(System.getProperties());
+  private final StringSubstitutor envSub = new StringSubstitutor(System.getenv());
+  private final StringSubstitutor sysPropSub = new StringSubstitutor(asMap(System.getProperties()));
+
+  @Nonnull
+  private Map<String, String> asMap(Properties properties) {
+    HashMap<String, String> map = new HashMap<>();
+    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+      map.put((String)entry.getKey(), (String)entry.getValue());
+    }
+    return map;
+  }
 
   @Inject
   public JsonConfigurationReader(Env env, ObjectMapper mapper) {

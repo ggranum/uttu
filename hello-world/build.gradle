@@ -48,9 +48,13 @@ dependencies {
     implementation "org.eclipse.jetty:jetty-server:${rootProject['versions.jetty']}"
     implementation "org.eclipse.jetty:jetty-servlet:${rootProject['versions.jetty']}"
 
-    runtime "org.apache.logging.log4j:log4j-slf4j-impl:${rootProject['versions.log4j']}"
-    runtime "org.slf4j:jcl-over-slf4j:${rootProject['versions.slf4j']}"
+    runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${rootProject['versions.log4j']}"
+    runtimeOnly "org.slf4j:jcl-over-slf4j:${rootProject['versions.slf4j']}"
 
 }
 
+application {
+    applicationName = project.parent.name + '-' + project.name
+    mainClassName = 'com.geoffgranum.uttu.helloworld.HelloWorldApplication'
+}
 
