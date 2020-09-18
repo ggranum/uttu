@@ -27,6 +27,7 @@ dependencies {
 
     implementation "commons-io:commons-io:${rootProject['versions.commonsIo']}"
     implementation "org.apache.commons:commons-lang3:${rootProject['versions.commons-lang3']}"
+    implementation "org.apache.commons:commons-text:${rootProject['versions.commons-text']}"
     implementation "org.apache.httpcomponents:httpcore:${rootProject['versions.httpcore']}"
     implementation "commons-codec:commons-codec:${rootProject['versions.commonsCodec']}"
 
@@ -34,8 +35,8 @@ dependencies {
     implementation "com.google.code.findbugs:jsr305:${rootProject['versions.findbugs']}"
 
     implementation "org.apache.logging.log4j:log4j-api:${rootProject['versions.log4j']}"
-    runtime "org.apache.logging.log4j:log4j-core:${rootProject['versions.log4j']}"
-    runtime "org.apache.logging.log4j:log4j-jcl:${rootProject['versions.log4j']}"
+    runtimeOnly "org.apache.logging.log4j:log4j-core:${rootProject['versions.log4j']}"
+    runtimeOnly "org.apache.logging.log4j:log4j-jcl:${rootProject['versions.log4j']}"
 
     implementation "com.fasterxml.jackson.core:jackson-databind:${rootProject['versions.jackson']}"
     // EL manager and CDI Required for hibernate validator versions 5 and newer. Cannot fathom how that decision was accepted. 
@@ -70,11 +71,11 @@ javadoc.options({
 })
 
 jar {
-    baseName = project.name
+    archiveBaseName = project.name
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
