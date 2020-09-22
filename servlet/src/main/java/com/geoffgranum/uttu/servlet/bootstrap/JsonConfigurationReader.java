@@ -11,153 +11,139 @@ import com.geoffgranum.uttu.core.base.Verify;
 import com.geoffgranum.uttu.core.exception.FatalException;
 import org.apache.commons.text.StringSubstitutor;
 
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 /**
  * The JsonConfigurationReader is intended for parsing configuration files specifically. More specifically, it is
  * intended for parsing configuration files at startup-time.
  * As such it performs property expansion, and on failure it throws FatalExceptions.
- *
+ * <p>
  * Files read by this class will have substitution parameters replaced, in a manner modeled after Log4j2.
  * See http://logging.apache.org/log4j/2.x/manual/configuration.html#PropertySubstitution
- *
- * The following contexts are provided:
- *
+ * <p>
+ * The actual processing of substitutions is provided b {@link org.apache.commons.text.StringSubstitutor},
+ * specifically {@link org.apache.commons.text.StringSubstitutor#createInterpolator()}
+ * <p>
+ * Some examples:
+ * <p>
  * ${env:KEY} Looks up KEY from System.getenv() map.
  * ${sys:KEY} Looks up KEY from System.getProperties() map.
- *
+ * ${date:yyyy-MM-dd} Formats the current date.
+ * <p>
+ * <p>
+ * <p>
  * Thus, a JSON file containing
  *
  * <code>
- *     {
- *         "somePassword": "MyFooVar${env:MY_DB_PASSWORD}"
- *     }
+ * {
+ * "somePassword": "MyFooVar${env:MY_DB_PASSWORD}"
+ * }
  * </code>
- *
+ * <p>
  * would attempt to lookup "MY_DB_PASSWORD" from System.getenv().
+ * <p>
+ * Default values can be provided by appending ":-" within the substitution string:
+ *
+ * <code>
+ * {
+ * "maxDbConnectionsWithDefault": "${sysEnv:MAX_DB_CONNECTIONS:-8}"
+ * }
+ * </code>
+ * <p>
+ * For more examples, see "Using Interpolation" in the StringSubstitutor class documentation.
  *
  * @author ggranum
  */
+@NotThreadSafe
 public class JsonConfigurationReader {
 
-  private final Env env;
-  private final ObjectMapper mapper;
-  private final StringSubstitutor envSub = new StringSubstitutor(System.getenv(), "${env:", "}");
-  private final StringSubstitutor sysPropSub = new StringSubstitutor(asMap(System.getProperties()), "${sys:", "}");
+    private final Env env;
+    private final ObjectMapper mapper;
+    private final StringSubstitutor interpolatorSub = StringSubstitutor.createInterpolator();
 
-  @Nonnull
-  private Map<String, String> asMap(Properties properties) {
-    HashMap<String, String> map = new HashMap<>();
-    for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-      map.put((String)entry.getKey(), (String)entry.getValue());
-    }
-    return map;
-  }
-
-  @Inject
-  public JsonConfigurationReader(Env env, ObjectMapper mapper) {
-    this.env = env;
-    this.mapper = mapper;
-  }
-
-  public JsonConfigurationReader(Env env) {
-    this(env, new ObjectMapper());
-  }
-
-  /**
-   *
-   *
-   * @deprecated Use read(File, Class)
-   */
-  @Deprecated
-  public <T> T read(String baseName, Class<T> type) {
-    File f = getConfigFileForEnvironment(baseName);
-    return read(f, type);
-  }
-
-  public <T> T read(File jsonFile, T typeInstance) {
-    //noinspection unchecked
-    return (T)this.read(jsonFile, typeInstance.getClass());
-  }
-
-  public <T> T read(InputStream jsonStream, Class<T> type) throws IOException {
-    return this.mapper.readValue(jsonStream, type);
-  }
-
-  public <T> T read(File jsonFile, Class<T> type) {
-    String json = readJsonFile(jsonFile);
-    T config;
-    try {
-      config = mapper.readValue(json, type);
-    } catch (IOException e) {
-      throw new FatalException(e,
-                               "Could not parse JSON config for env '%s' from file at path '%s'",
-                               env.key,
-                               jsonFile.getAbsolutePath());
+    @Inject
+    public JsonConfigurationReader(Env env, ObjectMapper mapper) {
+        this.env = env;
+        this.mapper = mapper;
+        interpolatorSub.setEnableSubstitutionInVariables(true);
     }
 
-    return config;
-  }
-
-  /**
-   * Assumes your configuration files live at {applicationRoot}/config/{configFileName}.{env.key}.json.
-   * If you don't want your configuration files to live at '{applicationRoot}/config/{configFileName}.{env.key}.json', then you'll
-   * need to override this method.
-   * If you don't want to parse from JSON... well, override the whole class. But this project assumes a lot of JSON use...
-   *
-   * @param baseName The base name for the config file, such as "myApp".
-   *
-   * @return The File, which has not been checked for existence.
-   */
-  private File getConfigFileForEnvironment(String baseName) {
-    String filePath = "config/" + baseName + "." + env.key + ".json";
-    return new File(filePath);
-  }
-
-  public String readJsonFile(File file) {
-    String content;
-    try {
-      byte[] contentBytes = Files.readAllBytes(file.toPath());
-      content = new String(contentBytes, StandardCharsets.UTF_8);
-    } catch (Exception e) {
-      throw new FatalException(e,
-                               "Could not read config file for env '%s' from file at path '%s'",
-                               env.key,
-                               file.getAbsolutePath());
+    public JsonConfigurationReader(Env env) {
+        this(env, new ObjectMapper());
     }
-    Verify.isNotEmpty(content,
-                      FatalException.class,
-                      "Could not read config file for env '%s' from file at path '%s'",
-                      env.key,
-                      file.getAbsolutePath());
 
-    content = replaceLookups(content);
-    return content;
-  }
+    public <T> T read(File jsonFile, T typeInstance) {
+        //noinspection unchecked
+        return (T) this.read(jsonFile, typeInstance.getClass());
+    }
 
-  /**
-   * Replaces matching substitution strings. Modeled after Log4j2.
-   * See http://logging.apache.org/log4j/2.x/manual/configuration.html#PropertySubstitution
-   *
-   * ${env:KEY} Looks up KEY from System.getenv() map.
-   * ${sys:KEY} Looks up KEY from System.getProperties() map.
-   *
-   * @param content The raw json content.
-   * @return the provided content with any substitution strings replaced by the values found in the relevant context.
-   */
-  private String replaceLookups(String content) {
-    StringBuilder result = new StringBuilder(content);
-    envSub.replaceIn(result);
-    sysPropSub.replaceIn(result);
-    return result.toString();
-  }
+    public <T> T read(InputStream jsonStream, Class<T> type) throws IOException {
+        return this.mapper.readValue(jsonStream, type);
+    }
+
+    public <T> T read(File jsonFile, Class<T> type) {
+        String content = readJsonFile(jsonFile);
+        return read(content, type);
+    }
+
+    public <T> T read(String jsonString, T type) {
+        //noinspection unchecked
+        return (T) read(jsonString, type.getClass());
+    }
+
+    public <T> T read(String jsonString, Class<T> type) {
+        String json = replaceLookups(jsonString);
+        T config;
+        try {
+            config = mapper.readValue(json, type);
+        } catch (IOException e) {
+            throw new FatalException(e,
+                    "Could not parse JSON config for env '%s'.",
+                    env.key);
+        }
+
+        return config;
+    }
+
+    public String readJsonFile(File file) {
+        String content;
+        try {
+            byte[] contentBytes = Files.readAllBytes(file.toPath());
+            content = new String(contentBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new FatalException(e,
+                    "Could not read config file for env '%s' from file at path '%s'",
+                    env.key,
+                    file.getAbsolutePath());
+        }
+        Verify.isNotEmpty(content,
+                FatalException.class,
+                "Could not read config file for env '%s' from file at path '%s'",
+                env.key,
+                file.getAbsolutePath());
+
+        return content;
+    }
+
+    /**
+     * Replaces matching substitution strings. Modeled after Log4j2.
+     * See http://logging.apache.org/log4j/2.x/manual/configuration.html#PropertySubstitution
+     * <p>
+     * ${env:KEY} Looks up KEY from System.getenv() map.
+     * ${sys:KEY} Looks up KEY from System.getProperties() map.
+     *
+     * @param content The raw json content.
+     * @return the provided content with any substitution strings replaced by the values found in the relevant context.
+     */
+    private String replaceLookups(String content) {
+        StringBuilder result = new StringBuilder(content);
+        interpolatorSub.replaceIn(result);
+        return result.toString();
+    }
 }
