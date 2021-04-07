@@ -47,7 +47,12 @@ public class LoggingGuiceFilter extends GuiceFilter {
     }
 
     try {
-      Log.trace(getClass(), "Request filtered: %s", ((HttpServletRequest)servletRequest).getRequestURL());
+      String query = ((HttpServletRequest) servletRequest).getQueryString();
+      if (StringUtils.isNotBlank(query)) {
+        Log.trace(getClass(), "Request filtered: %s?%s", ((HttpServletRequest) servletRequest).getRequestURL(), query);
+      } else {
+        Log.trace(getClass(), "Request filtered: %s", ((HttpServletRequest)servletRequest).getRequestURL());
+      }
     } catch (Exception e) {
       Log.error(getClass(), e, "Bad Log. No donut.");
     }
