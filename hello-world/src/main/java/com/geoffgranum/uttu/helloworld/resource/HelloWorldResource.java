@@ -28,6 +28,11 @@ public interface HelloWorldResource {
   String hello(@PathParam("whatever") String whatever);
 
   @GET()
+  @Path("/hello-query")
+  @Produces(MediaType.TEXT_PLAIN)
+  String helloQuery(@QueryParam("whatever") String whatever);
+
+  @GET()
   @Path("/version")
   @Produces(MediaType.TEXT_PLAIN)
   String version();

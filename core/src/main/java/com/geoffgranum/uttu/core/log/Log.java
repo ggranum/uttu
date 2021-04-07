@@ -21,47 +21,47 @@ import org.apache.logging.log4j.Logger;
  */
 public class Log {
 
-  public static void debug(Class clazz, String msgFormat, Object... args) {
+  public static void debug(Class<?> clazz, String msgFormat, Object... args) {
     log(Level.DEBUG, clazz, msgFormat, args);
   }
 
-  public static void debug(Class clazz, Throwable throwable, String msgFormat, Object... args) {
+  public static void debug(Class<?> clazz, Throwable throwable, String msgFormat, Object... args) {
     log(Level.DEBUG, clazz, throwable, msgFormat, args);
   }
 
-  public static boolean debugEnabled(Class clazz) {
+  public static boolean debugEnabled(Class<?> clazz) {
     return enabled(clazz, Level.DEBUG);
   }
 
-  public static boolean enabled(Class clazz, Level level) {
+  public static boolean enabled(Class<?> clazz, Level level) {
     return logger(clazz).isEnabled(level.level());
   }
 
-  private static Logger logger(Class clazz) {
+  private static Logger logger(Class<?> clazz) {
     return LogManager.getLogger(clazz);
   }
 
-  public static void error(Class clazz, String msgFormat, Object... args) {
+  public static void error(Class<?> clazz, String msgFormat, Object... args) {
     log(Level.ERROR, clazz, msgFormat, args);
   }
 
-  public static void error(Class clazz, Throwable throwable) {
+  public static void error(Class<?> clazz, Throwable throwable) {
     log(Level.ERROR, clazz, throwable, throwable.getMessage());
   }
 
-  public static void error(Class clazz, Throwable throwable, String msgFormat, Object... args) {
+  public static void error(Class<?> clazz, Throwable throwable, String msgFormat, Object... args) {
     log(Level.ERROR, clazz, throwable, msgFormat, args);
   }
 
-  public static void fatal(Class clazz, String msgFormat, Object... args) {
+  public static void fatal(Class<?> clazz, String msgFormat, Object... args) {
     log(Level.FATAL, clazz, msgFormat, args);
   }
 
-  public static void info(Class clazz, String msgFormat, Object... args) {
+  public static void info(Class<?> clazz, String msgFormat, Object... args) {
     log(Level.INFO, clazz, msgFormat, args);
   }
 
-  public static void log(Level level, Class clazz, String msgFormat, Object... args) {
+  public static void log(Level level, Class<?> clazz, String msgFormat, Object... args) {
 
     Logger logger = logger(clazz);
     if(logger.isEnabled(level.level())) {
@@ -77,7 +77,7 @@ public class Log {
     }
   }
 
-  public static void log(Level level, Class clazz, Throwable t, String msgFormat, Object... args) {
+  public static void log(Level level, Class<?> clazz, Throwable t, String msgFormat, Object... args) {
     Logger logger = logger(clazz);
     if(logger.isEnabled(level.level())) {
       logger.log(level.level(), safeFormat(msgFormat, args), t);
@@ -92,7 +92,7 @@ public class Log {
     }
   }
 
-  public static void log(Level level, boolean printStack, Class clazz, Throwable t, String msgFormat, Object... args) {
+  public static void log(Level level, boolean printStack, Class<?> clazz, Throwable t, String msgFormat, Object... args) {
     if(printStack) {
       log(level, clazz, t, msgFormat, args);
     } else {
@@ -104,7 +104,7 @@ public class Log {
     LogManager.getLogger(name).log(level.level(), safeFormat(msgFormat, args), throwable);
   }
 
-  public static void trace(Class clazz, String msgFormat, Object... args) {
+  public static void trace(Class<?> clazz, String msgFormat, Object... args) {
     log(Level.TRACE, clazz, msgFormat, args);
   }
 
@@ -112,25 +112,25 @@ public class Log {
     log(Level.TRACE, loggerName, msgFormat, args);
   }
 
-  public static boolean traceEnabled(Class clazz) {
+  public static boolean traceEnabled(Class<?> clazz) {
     return enabled(clazz, Level.TRACE);
   }
 
-  public static void unhandled(Class clazz, Throwable throwable) {
+  public static void unhandled(Class<?> clazz, Throwable throwable) {
     log(Level.ERROR, "UnhandledExceptions", throwable, throwable.getMessage());
     log(Level.ERROR, clazz, throwable, throwable.getMessage());
   }
 
-  public static void unhandled(Class clazz, Throwable throwable, String msgFormat, Object... args) {
+  public static void unhandled(Class<?> clazz, Throwable throwable, String msgFormat, Object... args) {
     log(Level.ERROR, "UnhandledExceptions", throwable, msgFormat, args);
     log(Level.ERROR, clazz, throwable, msgFormat, args);
   }
 
-  public static void warn(Class clazz, String msgFormat, Object... args) {
+  public static void warn(Class<?> clazz, String msgFormat, Object... args) {
     log(Level.WARN, clazz, msgFormat, args);
   }
 
-  public static void warn(Class clazz, Throwable throwable, String msgFormat, Object... args) {
+  public static void warn(Class<?> clazz, Throwable throwable, String msgFormat, Object... args) {
     log(Level.WARN, clazz, throwable, msgFormat, args);
   }
 

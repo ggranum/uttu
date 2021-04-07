@@ -23,7 +23,6 @@ public @interface Logged {
   /**
    * Disable logging based on log level. The cost of intercepting the method is about a half millisecond on fully spec'd 2015 MacBook Pro,
    * while the cost if logging is enabled for the class is nearly 60 milliseconds.
-   * @return
    */
   Level level() default Level.TRACE;
 

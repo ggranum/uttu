@@ -40,6 +40,12 @@ public class HelloWorldResourceImpl implements HelloWorldResource {
 
   @Logged(level = Level.INFO, perf = true)
   @Override
+  public String helloQuery(String whatever) {
+    return "Hello Query " + whatever;
+  }
+
+  @Logged(level = Level.INFO, perf = true)
+  @Override
   public ServerPerformanceInfo perfCheck(String anyValue) {
     LoggingInterceptorPerfInfo logInfo = new LoggingInterceptorPerfInfo.Builder()
                                              .withDefaults(runTestWithDefaults(anyValue)[1])

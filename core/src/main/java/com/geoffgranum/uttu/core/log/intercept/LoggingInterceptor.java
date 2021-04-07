@@ -52,7 +52,7 @@ public class LoggingInterceptor implements MethodInterceptor {
       result = invocation.proceed();
       if(intercept.perf) {
         long end = System.nanoTime();
-        Log.log(intercept.level, intercept.clazz, "Leave: %s [%d]", intercept.methodName, (end - start));
+        Log.log(intercept.level, intercept.clazz, "Leave: %s [%d] µs", intercept.methodName, (int)((end - start)/1E3));
       } else {
         Log.log(intercept.level, intercept.clazz, "Leave: %s", intercept.classAndMethod);
       }

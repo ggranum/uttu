@@ -7,6 +7,8 @@ package com.geoffgranum.uttu.servlet;
 
 import com.geoffgranum.uttu.core.log.Log;
 import com.google.inject.servlet.GuiceFilter;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,10 +26,14 @@ public class LoggingGuiceFilter extends GuiceFilter {
 
   @Override
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws
-      IOException,
-          ServletException {
+      IOException, ServletException {
     try {
-      Log.trace(getClass(), "Filtering request: %s", ((HttpServletRequest)servletRequest).getRequestURL());
+      String query = ((HttpServletRequest) servletRequest).getQueryString();
+      if (StringUtils.isNotBlank(query)) {
+        Log.trace(getClass(), "Filtering request: %s?%s", ((HttpServletRequest) servletRequest).getRequestURL(), query);
+      } else {
+        Log.trace(getClass(), "Filtering request: %s", ((HttpServletRequest)servletRequest).getRequestURL());
+      }
     } catch (Exception e) {
       Log.error(getClass(), e, "Bad Log. No donut.");
     }

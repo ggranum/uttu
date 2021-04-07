@@ -1,5 +1,6 @@
 {
-  "httpPort": 8080,
+  "httpPort": 4280,
+  "httpsPort": 4281,
   "someStringSet": [
     "value 1",
     "Value 2"
