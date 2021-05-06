@@ -39,12 +39,7 @@ It is completely possible to structure your application into a single project
 
 [source]
 ----
-
-repositories {
-	maven {
-		url  "https://dl.bintray.com/ggranum/uttu"
-	}
-}
+// @todo Update repository information
 
 dependencies {
 

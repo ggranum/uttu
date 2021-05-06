@@ -8,18 +8,10 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.jfrog.bintray'
 }
 
 version = rootProject['project.version']
 group = 'com.geoffgranum.uttu'
-
-
-repositories {
-    maven {
-        url "https://dl.bintray.com/ggranum/uttu"
-    }
-}
 
 dependencies {
 
@@ -86,7 +78,7 @@ artifacts {
 
 publishing {
     publications {
-        binTrayPublication(MavenPublication) {
+        releasePublication(MavenPublication) {
             from components.java
             artifact sourcesJar
             groupId group
@@ -115,26 +107,6 @@ publishing {
                     url = "https://github.com/ggranum/uttu"
                 }
             }
-        }
-    }
-}
-
-
-bintray {
-    user = project['project.bintray.username']
-    key = project['project.bintray.apiKey']
-    publications = ['binTrayPublication']
-    publish = true
-    pkg {
-        repo = 'uttu'
-        name = project.name
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/ggranum/uttu.git'
-        version {
-            name = version
-            desc = 'Common utility code for client server projects'
-            released = new Date()
-            vcsTag = version
         }
     }
 }

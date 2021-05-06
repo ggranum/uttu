@@ -10,9 +10,6 @@ buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
-    }
 }
 
 wrapper {
@@ -27,8 +24,6 @@ apply plugin: BuildProps
 buildProps.source("${project.rootDir}/gradle.local.properties")
 buildProps.required("build.env");
 buildProps.required(["project.version"])
-buildProps.required(["project.bintray.username"])
-buildProps.required(["project.bintray.apiKey"])
 
 
 buildProps.optional([])
