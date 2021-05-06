@@ -10,6 +10,7 @@ package com.geoffgranum.uttu.core.log.intercept;
  */
 
 import com.geoffgranum.uttu.core.log.Level;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -32,4 +33,10 @@ public @interface Logged {
    * See https://pzemtsov.github.io/2017/07/23/the-slow-currenttimemillis.html
    */
   boolean perf() default false;
+
+
+  /**
+   * Enable to log performance, including current memory use both before and after the method invocation.
+   */
+  boolean memPerf() default false;
 }

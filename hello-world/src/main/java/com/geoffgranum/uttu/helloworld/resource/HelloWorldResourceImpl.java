@@ -13,8 +13,9 @@ import com.geoffgranum.uttu.core.log.intercept.Logged;
 import com.geoffgranum.uttu.helloworld.domain.LoggingInterceptorPerfInfo;
 import com.geoffgranum.uttu.helloworld.domain.ServerPerformanceInfo;
 import com.geoffgranum.uttu.servlet.bootstrap.Env;
-import java.util.Random;
+
 import javax.inject.Inject;
+import java.util.Random;
 
 /**
  * @author ggranum
@@ -38,7 +39,7 @@ public class HelloWorldResourceImpl implements HelloWorldResource {
     return "Hello " + whatever;
   }
 
-  @Logged(level = Level.INFO, perf = true)
+  @Logged(level = Level.INFO, memPerf = true)
   @Override
   public String helloQuery(String whatever) {
     return "Hello Query " + whatever;
